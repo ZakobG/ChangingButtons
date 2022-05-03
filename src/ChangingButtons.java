@@ -1,54 +1,61 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Map;
 
-public class ChangingButtons implements ActionListener {
+public class ChangingButtons {
     JFrame f = new JFrame("Changing buttons");
-    JButton bttn;
+    int last = 0;
 
     HashMap<Integer, JButton> buttons = new HashMap<Integer, JButton>();
+    Color[] colors = {Color.black, Color.cyan, Color.green, Color.white, Color.magenta};
 
     void init() {
-        f.setSize(300, 300);
+        f.setSize(500, 500);
         f.setLayout(new GridLayout(3, 3));
         f.setLocationRelativeTo(null);
+        f.setResizable(false);
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     void fillMap() {
         for (int i = 0; i < 9; i++) {
-            buttons.put(i + 1, bttn = new JButton("" + (i + 1)));
+            buttons.put(i + 1, new JButton("" + (i + 1)));
         }
     }
 
     void setObjects() {
         for (JButton btn : buttons.values()) {
             f.add(btn);
-            btn.addActionListener(this);
+            btn.addActionListener(this::actionPerformer);
             f.setVisible(true);
         }
     }
 
+    void actionPerformer(ActionEvent e) {
+        scramble(keys(buttons, (JButton) e.getSource()));
+    }
 
-    public void actionPerformed(ActionEvent e) {
-        int x = (int) (Math.random() * 9);
+    void scramble(Integer n) {
+        int x = (int) (Math.random() * colors.length);
 
-        switch (x) {
-            case 0 -> bttn.setBackground(Color.black);
-            case 1 -> bttn.setBackground(Color.blue);
-            case 2 -> bttn.setBackground(Color.cyan);
-            case 3 -> bttn.setBackground(Color.gray);
-            case 4 -> bttn.setBackground(Color.green);
-            case 5 -> bttn.setBackground(Color.magenta);
-            case 6 -> bttn.setBackground(Color.orange);
-            case 7 -> bttn.setBackground(Color.pink);
-            case 8 -> bttn.setBackground(Color.red);
+        if (n != last) {
+            buttons.get(n).setBackground(Color.red);
+            for (int i = 1; i <= buttons.size(); i++) {
+                if (i != n) {
+                    buttons.get(i).setBackground(colors[x]);
+                }
+            }
         }
+    }
 
-        if (e.getSource() == buttons.get(1) && x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8) {
-            System.out.println(x);
-        }
+    public <K, V> K keys(Map<K, V> map, V value) {
+        return map
+                .entrySet()
+                .stream()
+                .filter(entry -> value.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst().get();
     }
 }
